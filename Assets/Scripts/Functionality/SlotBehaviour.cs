@@ -558,15 +558,15 @@ public class SlotBehaviour : MonoBehaviour
         //        StopAutoSpin();
         //    }
         //}
-        //if (!IsAutoSpin && !IsFreeSpin) // Reset spinning state and toggle buttons
-        //{
-        //    ToggleButtonGrp(true);
-        //    IsSpinning = false;
-        //}
-        //else
-        //{
-        //    IsSpinning = false;
-        //}
+        if (!IsAutoSpin && !IsFreeSpin) // Reset spinning state and toggle buttons
+        {
+           ToggleButtonGrp(true);
+           IsSpinning = false;
+        }
+        else
+        {
+           IsSpinning = false;
+        }
     }
     #endregion
 
@@ -826,16 +826,16 @@ public class SlotBehaviour : MonoBehaviour
     {
         if (SlotStart_Button) SlotStart_Button.interactable = toggle;
         if (AutoSpin_Button && !IsAutoSpin) AutoSpin_Button.interactable = toggle;
-        if (BetCounter != 0)
-        {
-            if (LineBetMinus_Button) LineBetMinus_Button.interactable = toggle;
-            if (TotalBetMinus_Button) TotalBetMinus_Button.interactable = toggle;
-        }
-        if(BetCounter < SocketManager.initialData.Bets.Count - 1)
-        {
-            if (LineBetPlus_Button) LineBetPlus_Button.interactable = toggle;
-            if (TotalBetPlus_Button) TotalBetPlus_Button.interactable = toggle;
-        }
+        // if (BetCounter != 0)
+        // {
+        //     if (LineBetMinus_Button) LineBetMinus_Button.interactable = toggle;
+        //     if (TotalBetMinus_Button) TotalBetMinus_Button.interactable = toggle;
+        // }
+        // if(BetCounter < SocketManager.initialData.Bets.Count - 1)
+        // {
+        //     if (LineBetPlus_Button) LineBetPlus_Button.interactable = toggle;
+        //     if (TotalBetPlus_Button) TotalBetPlus_Button.interactable = toggle;
+        // }
     }
 
     //Start the icons animation
@@ -898,12 +898,15 @@ public class SlotBehaviour : MonoBehaviour
         {
             float yPos = slotTransform.localPosition.y;
             slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, -tweenHeight-280);
-            tweener = slotTransform.DOLocalMoveY(yPos-120, .3f).SetLoops(-1, LoopType.Restart).SetEase(Ease.Linear).SetDelay(0).OnStepComplete(()=>{shuffleInitialMatrix(true);});
+            //tweener = slotTransform.DOLocalMoveY(yPos-120, .3f).SetLoops(-1, LoopType.Restart).SetEase(Ease.Linear).SetDelay(0).OnStepComplete(()=>{shuffleInitialMatrix(true);});
+            tweener = slotTransform.DOLocalMoveY(-621, .3f).SetLoops(-1, LoopType.Restart).SetEase(Ease.Linear).SetDelay(0).OnStepComplete(()=>{shuffleInitialMatrix(true);});
         }
         else
         {
             slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, 0);
-            tweener = slotTransform.DOLocalMoveY(-tweenHeight, .3f).SetLoops(-1, LoopType.Restart).SetEase(Ease.Linear).SetDelay(0).OnStepComplete(()=>{shuffleInitialMatrix(true);});
+            //tweener = slotTransform.DOLocalMoveY(-tweenHeight, .3f).SetLoops(-1, LoopType.Restart).SetEase(Ease.Linear).SetDelay(0).OnStepComplete(()=>{shuffleInitialMatrix(true);});
+            tweener = slotTransform.DOLocalMoveY(-2704, .3f).SetLoops(-1, LoopType.Restart).SetEase(Ease.Linear).SetDelay(0).OnStepComplete(()=>{shuffleInitialMatrix(true);});
+
         }
         tweener.Play();
         alltweens.Add(tweener);
@@ -916,10 +919,11 @@ public class SlotBehaviour : MonoBehaviour
             yield return alltweens[index].OnStepComplete(delegate { IsRegister = true; });
             yield return new WaitUntil(() => IsRegister);
         }
-        alltweens[index].Pause();
+        alltweens[index].Kill();
         int tweenpos = (reqpos * IconSizeFactor) - IconSizeFactor;
         slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, 0);
-        alltweens[index] = slotTransform.DOLocalMoveY(-1055, 0.5f).SetEase(Ease.OutQuad);
+        alltweens[index] = slotTransform.DOLocalMoveY(-tweenpos + 97.75f, 0.5f).SetEase(Ease.OutBack, 2);
+        //alltweens[index] = slotTransform.DOLocalMoveY(-1055 , 0.5f).SetEase(Ease.OutQuad);
         if (audioController) audioController.PlayWLAudio("spinStop");
         if(!isStop){
             yield return alltweens[index].WaitForCompletion();

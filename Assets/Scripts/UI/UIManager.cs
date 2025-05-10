@@ -177,41 +177,53 @@ public class UIManager : MonoBehaviour
     {
         if (audioController) audioController.PlayButtonAudio();
 
+        //if (IncDec)
+        // {
+        //     if(PageIndex < GameRulesPages.Count - 1)
+        //     {
+        //         PageIndex++;
+        //     }
+        //     if(PageIndex == GameRulesPages.Count - 1)
+        //     {
+        //         if (PaytableRight_Button) PaytableRight_Button.interactable = true;
+        //     }
+        //     if(PageIndex > 0)
+        //     {
+        //         if(PaytableLeft_Button) PaytableLeft_Button.interactable = true;
+        //     }
+        // }
+        // else
+        // {
+        //     if(PageIndex > 0)
+        //     {
+        //         PageIndex--;
+        //     }
+        //     if(PageIndex == 0)
+        //     {
+        //         if (PaytableLeft_Button) PaytableLeft_Button.interactable = true;
+        //     }
+        //     if(PageIndex < GameRulesPages.Count - 1)
+        //     {
+        //         if (PaytableRight_Button) PaytableRight_Button.interactable = true;
+        //     }
+        // }
         if (IncDec)
-        {
-            if(PageIndex < GameRulesPages.Count - 1)
-            {
-                PageIndex++;
-            }
-            if(PageIndex == GameRulesPages.Count - 1)
-            {
-                if (PaytableRight_Button) PaytableRight_Button.interactable = false;
-            }
-            if(PageIndex > 0)
-            {
-                if(PaytableLeft_Button) PaytableLeft_Button.interactable = true;
-            }
-        }
-        else
-        {
-            if(PageIndex > 0)
-            {
-                PageIndex--;
-            }
-            if(PageIndex == 0)
-            {
-                if (PaytableLeft_Button) PaytableLeft_Button.interactable = false;
-            }
-            if(PageIndex < GameRulesPages.Count - 1)
-            {
-                if (PaytableRight_Button) PaytableRight_Button.interactable = true;
-            }
-        }
+         {
+            PageIndex = (PageIndex + 1) % GameRulesPages.Count;
+         }
+         else
+          {
+            PageIndex = (PageIndex - 1 + GameRulesPages.Count) % GameRulesPages.Count;
+          }
+          
         foreach(GameObject g in GameRulesPages)
         {
             g.SetActive(false);
         }
         if (GameRulesPages[PageIndex]) GameRulesPages[PageIndex].SetActive(true);
+
+        if (PaytableLeft_Button) PaytableLeft_Button.interactable = true;
+        if (PaytableRight_Button) PaytableRight_Button.interactable = true;
     }
 
     private void OpenCloseMenu(bool toggle)
@@ -328,7 +340,7 @@ public class UIManager : MonoBehaviour
         }
 
         GameRulesPages[0].SetActive(true);
-        if(PaytableLeft_Button) PaytableLeft_Button.interactable = false;
+        if(PaytableLeft_Button) PaytableLeft_Button.interactable = true;
         if(PaytableRight_Button) PaytableRight_Button.interactable = true;
 
         if (PaytableMenuObject) PaytableMenuObject.SetActive(true);
