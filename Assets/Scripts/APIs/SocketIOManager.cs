@@ -24,12 +24,12 @@ public class SocketIOManager : MonoBehaviour
   private Socket gameSocket; //BackendChanges
   private SocketManager manager;
   protected string SocketURI = null;
-  // protected string TestSocketURI = "https://game-crm-rtp-backend.onrender.com/";
+  //  protected string TestSocketURI = "https://mx2md3l5-5000.inc1.devtunnels.ms/";
   protected string TestSocketURI = "http://localhost:5002/";
   [SerializeField] internal JSFunctCalls JSManager;
   [SerializeField] private string testToken;
-  protected string gameID = "SL-CLEO";
-  // protected string gameID = "";
+   protected string gameID = "SL-RB";
+ // protected string gameID = "";
   internal bool isLoaded = false;
   internal bool SetInit = false;
   private const int maxReconnectionAttempts = 6;
@@ -236,11 +236,12 @@ public class SocketIOManager : MonoBehaviour
     }
   }
 
-  internal void CloseSocket()
+  public void CloseSocket()
   {
     SendDataWithNamespace("EXIT");
 
   }
+
 
   internal void ReactNativeCallOnFailedToConnect() //BackendChanges
   {
@@ -268,10 +269,10 @@ public class SocketIOManager : MonoBehaviour
           if (!SetInit)
           {
             //Debug.Log(jsonObject);
-            List<string> LinesString = ConvertListListIntToListString(initialData.Lines);
+            // List<string> LinesString = ConvertListListIntToListString(initialData.Lines);
             List<string> InitialReels = ConvertListOfListsToStrings(initialData.Reel);
             InitialReels = RemoveQuotes(InitialReels);
-            PopulateSlotSocket(InitialReels, LinesString);
+            PopulateSlotSocket(InitialReels); //, LinesString
             SetInit = true;
           }
           else
@@ -282,14 +283,35 @@ public class SocketIOManager : MonoBehaviour
         }
       case "ResultData":
         {
-          //Debug.Log(jsonObject);
-          myData.message.GameData.FinalResultReel = ConvertListOfListsToStrings(myData.message.GameData.ResultReel);
-          myData.message.GameData.FinalsymbolsToEmit = TransformAndRemoveRecurring(myData.message.GameData.symbolsToEmit);
+          Debug.Log(jsonObject);
+          myData.message.GameData.FinalResultReel = ConvertListOfListsToStrings(myData.message.GameData.resultSymbols);
+          // myData.message.GameData.FinalsymbolsToEmit =
+          //     (myData.message.GameData.symbolsToEmit.Count > 0)
+          //     ? TransformAndRemoveRecurring(myData.message.GameData.symbolsToEmit[0].combination)
+          //     : null;
           resultData = myData.message.GameData;
           playerdata = myData.message.PlayerData;
           isResultdone = true;
           break;
         }
+
+         case "BonusResult":
+        {
+          Debug.Log(jsonObject);
+         // myData.message.GameData.FinalResultReel = ConvertListOfListsToStrings(myData.message.GameData.resultSymbols);
+          // myData.message.GameData.FinalsymbolsToEmit =
+          //     (myData.message.GameData.symbolsToEmit.Count > 0)
+          //     ? TransformAndRemoveRecurring(myData.message.GameData.symbolsToEmit[0].combination)
+          //     : null;
+          resultData.selectedIndex = myData.message.GameData.selectedIndex;
+          resultData.jackpotType = myData.message.GameData.jackpotType;
+          resultData.winAmount=myData.message.GameData.winAmount;
+          resultData.isOver= myData.message.GameData.isOver;
+          isResultdone = true;
+          break;
+        }
+
+        
       case "ExitUser":
         {
           if (gameSocket != null) //BackendChanges
@@ -310,7 +332,7 @@ public class SocketIOManager : MonoBehaviour
     uiManager.InitialiseUIData(initUIData.AbtLogo.link, initUIData.AbtLogo.logoSprite, initUIData.ToULink, initUIData.PopLink, initUIData.paylines);
   }
 
-  private void PopulateSlotSocket(List<string> slotPop, List<string> LineIds)
+  private void PopulateSlotSocket(List<string> slotPop)  //, List<string> LineIds
   {
     slotManager.shuffleInitialMatrix();
 
@@ -329,11 +351,36 @@ public class SocketIOManager : MonoBehaviour
     message.data = new BetData();
     message.data.currentBet = currBet;
     message.data.spins = 1;
-    message.data.currentLines = 20;
+    //message.data.currentLines = 20;
     message.id = "SPIN";
 
     // Serialize message data to JSON
     string json = JsonUtility.ToJson(message);
+    SendDataWithNamespace("message", json);
+  }
+  internal void SendSelectedWildData(int index)
+  {
+    WildData freeSpinoption = new WildData();
+    freeSpinoption.data = new Data();
+    freeSpinoption.data.option = index;
+    freeSpinoption.id = "FREESPINOPTION";
+
+    // Serialize message data to JSON
+    string json = JsonUtility.ToJson(freeSpinoption);
+    Debug.Log("@@@@ Free Spin Sent DATA :" + json + "    ::::::  iNDEX   " + freeSpinoption.data.option);
+    SendDataWithNamespace("message", json);
+  }
+
+  internal void SendSelectedFlipCoin(List<int> coinPosition)
+  {
+    MiniGameData miniGamedata = new MiniGameData();
+    miniGamedata.data = new Data();
+    miniGamedata.data.index = coinPosition;
+    miniGamedata.id = "BONUSCOINFLIP";
+
+    // Serialize message data to JSON
+    string json = JsonUtility.ToJson(miniGamedata);
+    Debug.Log("@@@@ Free Mini Sent DATA :" + json);
     SendDataWithNamespace("message", json);
   }
 
@@ -396,7 +443,7 @@ public class SocketIOManager : MonoBehaviour
     List<string> transformedList = new List<string>();
     foreach (string element in uniqueElements)
     {
-      transformedList.Add(element.Replace(",", ""));
+      transformedList.Add(element.ToString().Replace(",", ""));
     }
 
     return transformedList;
@@ -407,7 +454,7 @@ public class SocketIOManager : MonoBehaviour
 public class BetData
 {
   public double currentBet;
-  public double currentLines;
+  // public double currentLines;
   public double spins;
 }
 
@@ -453,9 +500,9 @@ public class GameData
   public bool canSwitchLines { get; set; }
   public List<int> LinesCount { get; set; }
   public List<int> autoSpin { get; set; }
-  public List<List<string>> ResultReel { get; set; }
+  public List<List<string>> resultSymbols { get; set; }
   public List<int> linesToEmit { get; set; }
-  public List<List<string>> symbolsToEmit { get; set; }
+  public List<SymbolsToEmit> symbolsToEmit { get; set; }
   public double WinAmout { get; set; }
   public FreeSpins freeSpins { get; set; }
   public List<string> FinalsymbolsToEmit { get; set; }
@@ -463,13 +510,32 @@ public class GameData
   public double jackpot { get; set; }
   public bool isBonus { get; set; }
   public double BonusStopIndex { get; set; }
+
+  public List<int> jackpotMultipliers { get; set; }
+
+  public List<FreespinOption> freespinOptions { get; set; }
+
+  public Bonus bonus { get; set; }
+  public List<int> goldenReels { get; set; }
+  public List<int> selectedIndex { get; set; }
+  public string jackpotType { get; set; }
+  public bool isOver { get; set; }
+  public double winAmount { get; set; }
+
+
 }
 
 [Serializable]
 public class FreeSpins
 {
   public int count { get; set; }
-  public bool isNewAdded { get; set; }
+  public bool isTriggered { get; set; }
+}
+[Serializable]
+public class Bonus
+{
+  public List<List<int>> matrix { get; set; }
+  public bool isTriggered { get; set; }
 }
 
 [Serializable]
@@ -479,6 +545,13 @@ public class Message
   public UIData UIData { get; set; }
   public PlayerData PlayerData { get; set; }
   public List<string> BonusData { get; set; }
+}
+
+[Serializable]
+public class SymbolsToEmit
+{
+  public List<string> combination { get; set; }
+  public float payout { get; set; }
 }
 
 [Serializable]
@@ -550,6 +623,33 @@ public class AuthTokenData
   public string cookie;
   public string socketURL;
   public string nameSpace; //BackendChanges
+}
+
+[Serializable]
+public class WildData
+{
+  public Data data;
+  public string id;
+}
+
+[Serializable]
+public class Data
+{
+  public int option;
+  public List<int> index;
+}
+
+[Serializable]
+public class MiniGameData
+{
+  public Data data;
+  public string id;
+}
+public class FreespinOption
+{
+  public int count { get; set; }
+  public List<int> multiplier { get; set; }
+  public List<float> bonusProbability { get; set; }
 }
 
 

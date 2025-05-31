@@ -13,15 +13,20 @@ public class UIManager : MonoBehaviour
 
     [Header("Win Popup")]
     [SerializeField] private Image Win_Image;
+
+    [SerializeField] public RectTransform Win_Image_RT;
+
     [SerializeField] private GameObject WinPopup_Object;
     [SerializeField] private RectTransform WinBgAnimation;
     [SerializeField] private Sprite BigWin_Sprite, HugeWin_Sprite, MegaWin_Sprite, Jackpot_Sprite;
     [SerializeField] private ImageAnimation JackpotImageAnimation;
     [SerializeField] private Button SkipWinAnimation;
+    [SerializeField] private TMP_Text Win_Text;
     private Tween ImageRotationTween;
     private Tween ImageScaleTween;
     private Tween AnimationScaleTween;
     private Tween DelayTween;
+
 
     [Header("Disconnection Popup")]
     [SerializeField] private Button CloseDisconnect_Button;
@@ -51,6 +56,22 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TMP_Text FreeSpin_Text;
     [SerializeField] private TMP_Text Jackpot_Text;
     [SerializeField] private TMP_Text Wild_Text;
+    [SerializeField] private TMP_Text MiniGameDis_Text;
+    [SerializeField] private TMP_Text MinorWin_Text;
+     [SerializeField] private TMP_Text MajorWin_Text;
+      [SerializeField] private TMP_Text GrandWin_Text;
+
+
+    [SerializeField] private TMP_Text GrayWild_MultiplierText;
+    [SerializeField] private TMP_Text RedWild_MultiplierText;
+    [SerializeField] private TMP_Text OrangeWild_MultiplierText;
+    [SerializeField] private TMP_Text BlueWild_MultiplierText;
+    [SerializeField] private TMP_Text YellowWild_MultiplierText;
+    [SerializeField] private TMP_Text PurpleWild_MultiplierText;
+    [SerializeField] private TMP_Text MiniGamGrayWild_MultiplierTexteDis_Text;
+    
+
+
     [SerializeField] private List<GameObject> GameRulesPages = new();
     private int PageIndex;
 
@@ -77,6 +98,13 @@ public class UIManager : MonoBehaviour
 
     [SerializeField] private SocketIOManager socketManager;
 
+    [Header(" BG Theme Images")]
+     public Sprite[] BG_ThemeSprites;
+     public Sprite[] Reels_BGSprites;
+
+     public Image Reels_BgImage;
+     public Image Bg_ThemeImage;
+    private Tween WinPopupTextTween;
     private bool isMusic = true;
     private bool isSound = true;
     private bool isExit = false;
@@ -363,8 +391,9 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    internal void PopulateWin(int value)
+    internal void PopulateWin(int value , double winAmount)
     {
+        Debug.Log($" Populated Win :" + value  );
         switch (value)
         {
             case 1:
@@ -378,12 +407,13 @@ public class UIManager : MonoBehaviour
                 break;
             case 4:
                 if (Win_Image) Win_Image.sprite = Jackpot_Sprite;
-                JackpotImageAnimation.StartAnimation();
+                //JackpotImageAnimation.StartAnimation();
                 break;
         }
 
-        StartPopupAnim();
+        StartPopupAnim(winAmount);
     }
+
     void SkipWin(){
         if(ImageScaleTween!=null){
             ImageScaleTween.Kill();
@@ -400,40 +430,70 @@ public class UIManager : MonoBehaviour
             DelayTween.Kill();
             DelayTween=null;
         }
-        Win_Image.rectTransform.DOScale(Vector3.zero, .2f).SetEase(Ease.InBack).OnComplete(() => ClosePopup(WinPopup_Object));
-        WinBgAnimation.DOScale(Vector3.zero, .2f).SetEase(Ease.InBack).OnComplete(()=> ImageRotationTween.Kill());
+        ClosePopup(WinPopup_Object);
+       // Win_Image.rectTransform.DOScale(Vector3.zero, .2f).SetEase(Ease.InBack).OnComplete(() => ClosePopup(WinPopup_Object));
+        // WinBgAnimation.DOScale(Vector3.zero, .2f).SetEase(Ease.InBack).OnComplete(()=> ImageRotationTween.Kill());
         slotManager.CheckPopups = false;
     }
-    private void StartPopupAnim()
+    private void StartPopupAnim(double amount)
     {
         if (WinPopup_Object) WinPopup_Object.SetActive(true);
         if (MainPopup_Object) MainPopup_Object.SetActive(true);
 
         audioController.PlayWLAudio("bigwin");
 
-        ImageScaleTween = Win_Image.rectTransform.DOScale(new Vector3(1, 1, 1), .5f).SetEase(Ease.OutCirc)
-        .OnComplete(()=>{ ImageScaleTween.Kill(); ImageScaleTween=null; });
+        // Set initial scale to 0.2
+        Win_Image_RT.localScale = Vector3.one * 0.2f;
+         // WinBgAnimation.localScale = Vector3.one * 0.2f;
 
-        ImageRotationTween = WinBgAnimation.DORotate(new Vector3(0, 0, 360), 2f, RotateMode.FastBeyond360)
-        .SetEase(Ease.Linear) // Make the rotation constant
-        .SetLoops(-1, LoopType.Incremental); // Rotate infinitely in an incremental way
+        // Create a DOTween sequence
+        Sequence popupSequence = DOTween.Sequence();
 
-        AnimationScaleTween = WinBgAnimation.DOScale(Vector3.one, .6f).SetEase(Ease.OutCirc)
-        .OnComplete(()=>{ AnimationScaleTween.Kill(); AnimationScaleTween=null; });
+        // Scale up to 1
+        popupSequence.Join(Win_Image_RT.DOScale(1.2f, 0.5f).SetEase(Ease.OutCirc));
+        // popupSequence.Join(WinBgAnimation.DOScale(1f, 2f).SetEase(Ease.OutCirc));
 
-        DelayTween = DOVirtual.DelayedCall(3f, () =>
+        // Scale down to 0.1
+        popupSequence.Append(Win_Image_RT.DOScale(0.5f, 0.6f).SetEase(Ease.InCirc));
+        // popupSequence.Join(WinBgAnimation.DOScale(0.5f, 2f).SetEase(Ease.InOutSine));
+
+        // Scale back up to 1
+        popupSequence.Append(Win_Image_RT.DOScale(1.2f, 0.8f).SetEase(Ease.OutCirc));
+        popupSequence.Append(Win_Image_RT.DOScale(1f, 0.4f).SetEase(Ease.OutCirc));
+
+        
+         double initAmount = 0;
+        WinPopupTextTween = DOTween.To(() => initAmount, (val) => initAmount = val, amount, 3.5f).OnUpdate(() =>
         {
-            Win_Image.rectTransform.DOScale(Vector3.zero, .5f).SetEase(Ease.InBack).OnComplete(() => ClosePopup(WinPopup_Object));
+            if (Win_Text) Win_Text.text = initAmount.ToString("F3");
+        });
+        //popupSequence.Join(WinBgAnimation.DOScale(1f, 2f).SetEase(Ease.OutBack));
 
-            WinBgAnimation.DOScale(Vector3.zero, .5f).SetEase(Ease.InBack).OnComplete(()=> ImageRotationTween.Kill());
 
-            slotManager.CheckPopups = false;
-        }).OnComplete(()=> { DelayTween.Kill(); DelayTween=null;});
+
+        // ImageScaleTween = Win_Image.rectTransform.DOScale(new Vector3(1, 1, 1), .5f).SetEase(Ease.OutCirc)
+        // .OnComplete(()=>{ ImageScaleTween.Kill(); ImageScaleTween=null; });
+
+        // ImageRotationTween = WinBgAnimation.DORotate(new Vector3(0, 0, 360), 2f, RotateMode.FastBeyond360)
+        // .SetEase(Ease.Linear) // Make the rotation constant
+        // .SetLoops(-1, LoopType.Incremental); // Rotate infinitely in an incremental way
+
+        // AnimationScaleTween = WinBgAnimation.DOScale(Vector3.one, .6f).SetEase(Ease.OutCirc)
+        // .OnComplete(()=>{ AnimationScaleTween.Kill(); AnimationScaleTween=null; });
+
+        // DelayTween = DOVirtual.DelayedCall(3f, () =>
+        // {
+        //     Win_Image.rectTransform.DOScale(Vector3.zero, .5f).SetEase(Ease.InBack).OnComplete(() => ClosePopup(WinPopup_Object));
+
+        //     WinBgAnimation.DOScale(Vector3.zero, .5f).SetEase(Ease.InBack).OnComplete(()=> ImageRotationTween.Kill());
+
+        //     slotManager.CheckPopups = false;
+        // }).OnComplete(()=> { DelayTween.Kill(); DelayTween=null;});
     }
 
     internal void ADfunction()
     {
-        OpenPopup(ADPopup_Object); 
+        OpenPopup(ADPopup_Object);
     }
 
     internal void InitialiseUIData(string SupportUrl, string AbtImgUrl, string TermsUrl, string PrivacyUrl, Paylines symbolsText)
@@ -449,15 +509,15 @@ public class UIManager : MonoBehaviour
             string text = null;
             if (paylines.symbols[i].Multiplier[0][0] != 0)
             {
-                text += "5x - " + paylines.symbols[i].Multiplier[0][0]+"x";
+                text += "5x - " + paylines.symbols[i].Multiplier[0][0] + "x";
             }
             if (paylines.symbols[i].Multiplier[1][0] != 0)
             {
-                text += "\n4x - " + paylines.symbols[i].Multiplier[1][0]+"x";
+                text += "\n4x - " + paylines.symbols[i].Multiplier[1][0] + "x";
             }
             if (paylines.symbols[i].Multiplier[2][0] != 0)
             {
-                text += "\n3x - " + paylines.symbols[i].Multiplier[2][0]+"x";
+                text += "\n3x - " + paylines.symbols[i].Multiplier[2][0] + "x";
             }
             if (SymbolsText[i]) SymbolsText[i].text = text;
         }
@@ -467,8 +527,8 @@ public class UIManager : MonoBehaviour
             if (paylines.symbols[i].Name.ToUpper() == "FREESPIN")
             {
                 if (FreeSpin_Text) FreeSpin_Text.text = paylines.symbols[i].description.ToString();
-            }            
-            if (paylines.symbols[i].Name.ToUpper() == "JACKPOT")
+            }
+            if (paylines.symbols[i].Name.ToUpper() == "SCATTER")
             {
                 if (Jackpot_Text) Jackpot_Text.text = paylines.symbols[i].description.ToString();
             }
@@ -476,7 +536,33 @@ public class UIManager : MonoBehaviour
             {
                 if (Wild_Text) Wild_Text.text = paylines.symbols[i].description.ToString();
             }
+
+            if (paylines.symbols[i].Name.ToUpper() == "POT")
+            {
+                if (MiniGameDis_Text) MiniGameDis_Text.text = paylines.symbols[i].description.ToString();
+            }
+
         }
+        SetWildMultiplierData();
+        SetJackPotData();
+    }
+
+     public void SetWildMultiplierData()
+    {
+        //Set Free Spins Data
+        if (GrayWild_MultiplierText) GrayWild_MultiplierText.text = socketManager.initialData.freespinOptions[0].count.ToString() +" Free Spins "+"\n"+ string.Join(", ", socketManager.initialData.freespinOptions[0].multiplier) +" Wild Multiplier";
+        if (RedWild_MultiplierText) RedWild_MultiplierText.text = socketManager.initialData.freespinOptions[1].count.ToString() + " Free Spins " + "\n" + string.Join(", ", socketManager.initialData.freespinOptions[1].multiplier) + " Wild Multiplier";
+        if (OrangeWild_MultiplierText) OrangeWild_MultiplierText.text = socketManager.initialData.freespinOptions[2].count.ToString()+ " Free Spins " + "\n"+ string.Join(", ", socketManager.initialData.freespinOptions[2].multiplier)+ " Wild Multiplier";
+        if (PurpleWild_MultiplierText) PurpleWild_MultiplierText.text = socketManager.initialData.freespinOptions[3].count.ToString()+ " Free Spins " + "\n"+ string.Join(", ", socketManager.initialData.freespinOptions[3].multiplier)+ " Wild Multiplier";
+        if (BlueWild_MultiplierText) BlueWild_MultiplierText.text = socketManager.initialData.freespinOptions[4].count.ToString()+ " Free Spins " + "\n"+ string.Join(", ", socketManager.initialData.freespinOptions[4].multiplier)+ " Wild Multiplier";
+        if (YellowWild_MultiplierText) YellowWild_MultiplierText.text = socketManager.initialData.freespinOptions[5].count.ToString()+ " Free Spins " + "\n"+ string.Join(", ", socketManager.initialData.freespinOptions[5].multiplier)+ " Wild Multiplier";
+    }
+
+    public void SetJackPotData()
+    {
+       MinorWin_Text.text= socketManager.initialData.jackpotMultipliers[0].ToString()+" x Total Bet";
+        MajorWin_Text.text = socketManager.initialData.jackpotMultipliers[1].ToString() +" x Total Bet";
+        GrandWin_Text.text=socketManager.initialData.jackpotMultipliers[2].ToString()+ " x Total Bet ";
     }
 
     private void CallOnExitFunction()

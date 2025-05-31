@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,6 +18,8 @@ public class ImageAnimation : MonoBehaviour
 	public Image rendererDelegate;
 	public bool useSharedMaterial = true;
 	public bool doLoopAnimation = true;
+	public bool StartOnEnable;
+
 	private int indexOfTexture;
 	private float idealFrameRate = 0.0416666679f;
 	private float delayBetweenAnimation;
@@ -29,9 +32,13 @@ public class ImageAnimation : MonoBehaviour
 		{
 			Instance = this;
 		}
+	}
+    void OnEnable()
+    {
+		if (StartOnEnable) StartAnimation();
     }
 
-	private void OnDisable()
+    private void OnDisable()
 	{
 		StopAnimation();
 	}
