@@ -630,7 +630,7 @@ public class SlotBehaviour : MonoBehaviour
 
 
         currentBalance = SocketManager.playerdata.Balance;
-        currentTotalBet = SocketManager.initialData.Bets[BetCounter] * Lines;
+        currentTotalBet = SocketManager.initialData.Bets[BetCounter] ;
         CompareBalance();
         SetWildFreeSpinData();
         uiManager.InitialiseUIData(SocketManager.initUIData.AbtLogo.link, SocketManager.initUIData.AbtLogo.logoSprite, SocketManager.initUIData.ToULink, SocketManager.initUIData.PopLink, SocketManager.initUIData.paylines);
@@ -896,8 +896,11 @@ public class SlotBehaviour : MonoBehaviour
         if (SocketManager.playerdata.currentWining > 0) WinningsTextAnimation(bonus); // Trigger winnings animation if applicable
         if(!bonus)
         {
+
+            CheckPopups = true;
             CheckWinPopups();
         }
+         yield return new WaitUntil(() => !CheckPopups);
         if (SocketManager.resultData.symbolsToEmit.Count > 0)
         {
             CheckPopups = true;

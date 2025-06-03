@@ -444,7 +444,7 @@ public class UIManager : MonoBehaviour
 
         // Set initial scale to 0.2
         Win_Image_RT.localScale = Vector3.one * 0.2f;
-         // WinBgAnimation.localScale = Vector3.one * 0.2f;
+        // WinBgAnimation.localScale = Vector3.one * 0.2f;
 
         // Create a DOTween sequence
         Sequence popupSequence = DOTween.Sequence();
@@ -461,34 +461,14 @@ public class UIManager : MonoBehaviour
         popupSequence.Append(Win_Image_RT.DOScale(1.2f, 0.8f).SetEase(Ease.OutCirc));
         popupSequence.Append(Win_Image_RT.DOScale(1f, 0.4f).SetEase(Ease.OutCirc));
 
-        
-         double initAmount = 0;
+
+        double initAmount = 0;
         WinPopupTextTween = DOTween.To(() => initAmount, (val) => initAmount = val, amount, 3.5f).OnUpdate(() =>
         {
             if (Win_Text) Win_Text.text = initAmount.ToString("F3");
         });
-        //popupSequence.Join(WinBgAnimation.DOScale(1f, 2f).SetEase(Ease.OutBack));
 
-
-
-        // ImageScaleTween = Win_Image.rectTransform.DOScale(new Vector3(1, 1, 1), .5f).SetEase(Ease.OutCirc)
-        // .OnComplete(()=>{ ImageScaleTween.Kill(); ImageScaleTween=null; });
-
-        // ImageRotationTween = WinBgAnimation.DORotate(new Vector3(0, 0, 360), 2f, RotateMode.FastBeyond360)
-        // .SetEase(Ease.Linear) // Make the rotation constant
-        // .SetLoops(-1, LoopType.Incremental); // Rotate infinitely in an incremental way
-
-        // AnimationScaleTween = WinBgAnimation.DOScale(Vector3.one, .6f).SetEase(Ease.OutCirc)
-        // .OnComplete(()=>{ AnimationScaleTween.Kill(); AnimationScaleTween=null; });
-
-        // DelayTween = DOVirtual.DelayedCall(3f, () =>
-        // {
-        //     Win_Image.rectTransform.DOScale(Vector3.zero, .5f).SetEase(Ease.InBack).OnComplete(() => ClosePopup(WinPopup_Object));
-
-        //     WinBgAnimation.DOScale(Vector3.zero, .5f).SetEase(Ease.InBack).OnComplete(()=> ImageRotationTween.Kill());
-
-        //     slotManager.CheckPopups = false;
-        // }).OnComplete(()=> { DelayTween.Kill(); DelayTween=null;});
+        Invoke("SkipWin", 4f);
     }
 
     internal void ADfunction()
