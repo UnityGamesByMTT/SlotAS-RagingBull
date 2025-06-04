@@ -20,6 +20,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] private RectTransform WinBgAnimation;
     [SerializeField] private Sprite BigWin_Sprite, HugeWin_Sprite, MegaWin_Sprite, Jackpot_Sprite;
     [SerializeField] private ImageAnimation JackpotImageAnimation;
+    [SerializeField] private Sprite Major_Sprite, Minor_Sprite, Grand_Sprite;
+
     [SerializeField] private Button SkipWinAnimation;
     [SerializeField] private TMP_Text Win_Text;
     private Tween ImageRotationTween;
@@ -408,6 +410,15 @@ public class UIManager : MonoBehaviour
             case 4:
                 if (Win_Image) Win_Image.sprite = Jackpot_Sprite;
                 //JackpotImageAnimation.StartAnimation();
+                break;
+            case 5:
+                if (Win_Image) Win_Image.sprite = Minor_Sprite;
+                break;
+            case 6:
+                if (Win_Image) Win_Image.sprite = Major_Sprite;
+                break;
+                case 7:
+                if (Win_Image) Win_Image.sprite = Grand_Sprite;
                 break;
         }
 

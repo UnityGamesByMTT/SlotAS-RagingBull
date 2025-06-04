@@ -42,6 +42,7 @@ public class BonusController : MonoBehaviour
     {
         if (BonusWinningsText) BonusWinningsText.text = "0.00";
         if (BonusGame_Panel) BonusGame_Panel.SetActive(true);
+        BonusOpeningUI.SetActive(true);
         uiManager.Bg_ThemeImage.sprite = uiManager.BG_ThemeSprites[1];
         uiManager.Reels_BgImage.sprite = uiManager.Reels_BGSprites[1];
         FreeSpinCounts = 0;
