@@ -69,9 +69,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TMP_Text OrangeWild_MultiplierText;
     [SerializeField] private TMP_Text BlueWild_MultiplierText;
     [SerializeField] private TMP_Text YellowWild_MultiplierText;
-    [SerializeField] private TMP_Text PurpleWild_MultiplierText;
-    [SerializeField] private TMP_Text MiniGamGrayWild_MultiplierTexteDis_Text;
-    
+    [SerializeField] private TMP_Text PurpleWild_MultiplierText;    
 
 
     [SerializeField] private List<GameObject> GameRulesPages = new();
@@ -541,12 +539,12 @@ public class UIManager : MonoBehaviour
      public void SetWildMultiplierData()
     {
         //Set Free Spins Data
-        if (GrayWild_MultiplierText) GrayWild_MultiplierText.text = socketManager.initialData.freespinOptions[0].count.ToString() +" Free Spins "+"\n"+ string.Join(", ", socketManager.initialData.freespinOptions[0].multiplier) +" Wild Multiplier";
-        if (RedWild_MultiplierText) RedWild_MultiplierText.text = socketManager.initialData.freespinOptions[1].count.ToString() + " Free Spins " + "\n" + string.Join(", ", socketManager.initialData.freespinOptions[1].multiplier) + " Wild Multiplier";
-        if (OrangeWild_MultiplierText) OrangeWild_MultiplierText.text = socketManager.initialData.freespinOptions[2].count.ToString()+ " Free Spins " + "\n"+ string.Join(", ", socketManager.initialData.freespinOptions[2].multiplier)+ " Wild Multiplier";
-        if (PurpleWild_MultiplierText) PurpleWild_MultiplierText.text = socketManager.initialData.freespinOptions[3].count.ToString()+ " Free Spins " + "\n"+ string.Join(", ", socketManager.initialData.freespinOptions[3].multiplier)+ " Wild Multiplier";
-        if (BlueWild_MultiplierText) BlueWild_MultiplierText.text = socketManager.initialData.freespinOptions[4].count.ToString()+ " Free Spins " + "\n"+ string.Join(", ", socketManager.initialData.freespinOptions[4].multiplier)+ " Wild Multiplier";
-        if (YellowWild_MultiplierText) YellowWild_MultiplierText.text = socketManager.initialData.freespinOptions[5].count.ToString()+ " Free Spins " + "\n"+ string.Join(", ", socketManager.initialData.freespinOptions[5].multiplier)+ " Wild Multiplier";
+        if (GrayWild_MultiplierText) GrayWild_MultiplierText.text = socketManager.initialData.freespinOptions[0].count.ToString() +" Free Spins "+"\n"+ string.Join("x, ", socketManager.initialData.freespinOptions[0].multiplier) +"x Multiplier";
+        if (RedWild_MultiplierText) RedWild_MultiplierText.text = socketManager.initialData.freespinOptions[1].count.ToString() + " Free Spins " + "\n" + string.Join("x, ", socketManager.initialData.freespinOptions[1].multiplier) + "x Multiplier";
+        if (OrangeWild_MultiplierText) OrangeWild_MultiplierText.text = socketManager.initialData.freespinOptions[2].count.ToString()+ " Free Spins " + "\n"+ string.Join("x, ", socketManager.initialData.freespinOptions[2].multiplier)+ "x Multiplier";
+        if (PurpleWild_MultiplierText) PurpleWild_MultiplierText.text = socketManager.initialData.freespinOptions[3].count.ToString()+ " Free Spins " + "\n"+ string.Join("x, ", socketManager.initialData.freespinOptions[3].multiplier)+ "x Multiplier";
+        if (BlueWild_MultiplierText) BlueWild_MultiplierText.text = socketManager.initialData.freespinOptions[4].count.ToString()+ " Free Spins " + "\n"+ string.Join("x, ", socketManager.initialData.freespinOptions[4].multiplier)+ "x Multiplier";
+        if (YellowWild_MultiplierText) YellowWild_MultiplierText.text = socketManager.initialData.freespinOptions[5].count.ToString()+ " Free Spins " + "\n"+ string.Join("x, ", socketManager.initialData.freespinOptions[5].multiplier)+ "x Multiplier";
     }
 
     public void SetJackPotData()

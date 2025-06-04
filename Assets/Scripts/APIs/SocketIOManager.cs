@@ -586,24 +586,30 @@ public class Symbol
   public object MultiplierObject { get; set; }
 
   // This property will hold the properly deserialized list of lists of integers
-  [JsonIgnore]
-  public List<List<int>> Multiplier { get; private set; }
+ [JsonIgnore]
+    public List<List<decimal>> Multiplier { get; private set; }
 
   // Custom deserialization method to handle the conversion
   [OnDeserialized]
-  internal void OnDeserializedMethod(StreamingContext context)
-  {
-    // Handle the case where multiplier is an object (empty in JSON)
-    if (MultiplierObject is JObject)
+    internal void OnDeserializedMethod(StreamingContext context)
     {
-      Multiplier = new List<List<int>>();
+        try
+        {
+            if (MultiplierObject is JObject)
+            {
+                Multiplier = new List<List<decimal>>();
+            }
+            else
+            {
+                Multiplier = JsonConvert.DeserializeObject<List<List<decimal>>>(MultiplierObject.ToString());
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error deserializing multiplier: {ex.Message}");
+            Multiplier = new List<List<decimal>>();
+        }
     }
-    else
-    {
-      // Deserialize normally assuming it's an array of arrays
-      Multiplier = JsonConvert.DeserializeObject<List<List<int>>>(MultiplierObject.ToString());
-    }
-  }
   public object defaultAmount { get; set; }
   public object symbolsCount { get; set; }
   public object increaseValue { get; set; }
@@ -648,7 +654,7 @@ public class MiniGameData
 public class FreespinOption
 {
   public int count { get; set; }
-  public List<int> multiplier { get; set; }
+  public List<double> multiplier { get; set; }
   public List<float> bonusProbability { get; set; }
 }
 

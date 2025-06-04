@@ -805,6 +805,8 @@ public class SlotBehaviour : MonoBehaviour
             yield return new WaitForSeconds(1);
             yield break;
         }
+        ToggleButtonGrp(false);
+
         if (TotalWin_text) TotalWin_text.text = "0.000";
         ReelIndexNumber = 0;
         boostDuration = 1.5f;
@@ -1348,6 +1350,8 @@ public class SlotBehaviour : MonoBehaviour
         Debug.Log($" toggle btn grp called :" + toggle);
         if (SlotStart_Button) SlotStart_Button.interactable = toggle;
         if (AutoSpin_Button && !IsAutoSpin) AutoSpin_Button.interactable = toggle;
+        if (TotalBetPlus_Button) TotalBetPlus_Button.interactable = toggle;
+        if (TotalBetMinus_Button) TotalBetMinus_Button.interactable = toggle;   
         // if (BetCounter != 0)
         // {
         //     if (LineBetMinus_Button) LineBetMinus_Button.interactable = toggle;
